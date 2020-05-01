@@ -1,4 +1,5 @@
 import pygame
+import time
 from sys import exit
 import tkinter as tk
 from tkinter import *
@@ -11,6 +12,7 @@ import requests
 def canvasInit():
     # pygame初始化
     pygame.init()
+    # 声明变量canvas，并设置为全局变量
     global canvas
     canvas = pygame.display.set_mode((1050, 660), 0, 32)
     pygame.display.set_caption('寻找嫌疑人')
@@ -26,13 +28,15 @@ def resize(w, h, new_w, new_h, pil_image):
     return pil_image.resize((width, height), Image.ANTIALIAS)
 
 
-fileList = []  # 图片路径列表
-totalList = []  # 储存所有所需数据
+fileList = []  # 图片路径列表 C:/嫌疑人照片/谈俊粼.png
+totalList = []  # 存储所有所需的数据
 
 
 # 选择图片函数
 def selectPhoto():
-    file = filedialog.askopenfilename(initialdir="C:/", title='Choose an image.')  # 图片路径
+    # 当点击选择按钮以后，打开对应的路径文件 dialog路径
+    file = filedialog.askopenfilename(initialdir="C:/嫌疑人照片", title='Choose an image.')  # 图片路径
+    # length 长度
     if len(file) > 0:  # 判断是否选择图片“0”为取消
         fileList.append(file)  # 将选中图片添加到列表中
     length = len(fileList)
@@ -61,14 +65,15 @@ def selectPhoto():
 def showPhoto(route, xPos, yPos):
     # 获取图片
     image = Image.open(route)
-    # 获取原图片尺寸
+    # 获取原图片尺寸w：width  h:height
     w, h = image.size
-    # 重置尺寸
+    # 重置尺寸 recover
     resized = resize(w, h, 150, 150, image)
     # 展示图片
     photo = ImageTk.PhotoImage(resized)
     photoLabel = tk.Label(window, image=photo, width=145, height=145)
     photoLabel.place(x=xPos, y=yPos)
+    # 调用窗口主程序
     window.mainloop()
 
 
@@ -76,6 +81,7 @@ def showPhoto(route, xPos, yPos):
 def getToken():
     host = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials' \
            '&client_id=T1KUrVlob1vUuLpQ0sOYrfoB&client_secret=obx6I60FomQIHqRwlx3mp1GXTGKOkHPu'
+    # request请求   get获取
     response = requests.get(host)
     content = response.json()
     content = content['access_token']
@@ -84,13 +90,14 @@ def getToken():
 
 # 获取人脸识别数据
 def getData():
-    # 请补全请求地址
+    # 请补全请求地址 request请求
     requestUrl = 'https://aip.baidubce.com/rest/2.0/face/v3/detect'
     # 请在下方完成你的代码
-    # 设置token参数-->从百度api中获得数据
+    # 设置token数据 --> 从百度api中获取数据
     token = getToken()
-    # 设置参数
+    # 设置token参数
     params = {"access_token": token}
+    # 遍历图片列表
     for iUrl in fileList:
         # 获取图片存入变量f中
         f = open(iUrl, "rb")
@@ -98,17 +105,16 @@ def getData():
         temp = f.read()
         # 将temp加密传输
         image = base64.b64encode(temp)
-        # 设置数据
+        # 设置数据 data数据  date日期
         data = {
-            # 传输的数据内容"键名":键值
-            # 传输内容
-            'image': image,
+            # 传输图片内容  "键名":键值
+            "image": image,
             # 图片的加密方式
-            'image_type': "BASE64",
-            # 识别内容
-            'face_field': "age,gender,face_shape"
+            "image_type": "BASE64",
+            # 识别内容:年龄，性别，脸型
+            "face_field": "age,gender,face_shape"
         }
-        # post加密发送-->1.没有大小限制 2.传输加密
+        # post加密发送-->1.没有大小限制  2.传输加密
         response = requests.post(requestUrl, params=params, data=data)
         print(response)
         # 将response返回结果进行json解析
@@ -116,67 +122,78 @@ def getData():
         print(content)
         # 获取年龄
         age = content['result']['face_list'][0]['age']
-        print("年龄为：", age)
+        print("年龄为:", age)
         # 性别
         gender = content['result']['face_list'][0]['gender']['type']
         pro = content['result']['face_list'][0]['gender']['probability']
-        # 如果性别判断为男性
-        if gender == 'male':
-            print("性别为：", "男性")
-        # 如果性别判断为女性
-        if gender == 'female':
-            print("性别为：", "女性")
-        print("判断的正确率：" + str(pro * 100) + "%")
+        print("性别为:", gender)
+        print("性别判断正确的概率为:", str(pro * 100) + "%")
         # 脸型
         shape = content['result']['face_list'][0]['face_shape']['type']
-        # 脸型判断
-        if shape == 'square':
-            shape = '国字脸'
-        elif shape == 'triangle':
-            shape = '瓜子脸'
-        elif shape == 'oval':
-            shape = '鹅蛋脸'
-        elif shape == 'heart':
-            shape = '心形脸'
+        print("脸型为:", shape)
+        # 性别判断
+        if gender == "male":
+            gender = "男性"
         else:
-            shape = '圆脸'
-        print("脸型为：", shape)
-        # 储存全部所需数据
+            gender = "女性"
+        # 脸型判断
+        if shape == "square":
+            shape = "国字脸"
+        elif shape == "triangle":
+            shape = "瓜子脸"
+        elif shape == "oval":
+            shape = "鹅蛋脸"
+        elif shape == "heart":
+            shape = "心形脸"
+        else:
+            shape = "圆脸"
+        print("转换后的脸型为:", shape)
+        print("转换以后的性别为:", gender)
+        # 存储全部所需数据
         tempDict = {
             # 图片路径
             'image': iUrl,
-            # 年龄，性别，脸型
+            # 年龄  性别  脸型
             'age': age,
             'gender': gender,
             'shape': shape
-
         }
-        # 将tempDict字典储存到totalList中
+        # 将tempDict字典，存储到列表totalList中
         totalList.append(tempDict)
-        print("totalList= ", totalList)
-        # 关闭二级界面
-        window.destroy()
-        showResult()
+        print("totalList = ", totalList)    
+    # 关闭二级界面
+    window.destroy()
+    showResult()
 
 
-# 创建结果显示的方法
+# 创建结果展示的方法
 def showResult():
     # 创建pygame界面
     canvasInit()
     # 设置背景图
-    backgroud = pygame.image.load("images/suspectInfo.png")
+    background = pygame.image.load("images/suspectInfo.png")
     # 传输图片
-    canvas.blit(backgroud, (0, 0))
+    canvas.blit(background, (0, 0))
+    # 设置窗口的关闭功能
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-    pygame.display.update()
-    
-# 创建绘制传输结果的方法:两个参数：图片下标，图片位置
-def drawResult(index,imagePos):
-    # 绘制图片的路径
+                exit()
+        # 绘制传输结果(1.图片路径  2.图片年龄  3.图片性别  4.图片脸型)
+
+        # 设置屏幕更新
+        pygame.display.update()
+
+
+# 创建绘制传输结果的方法:两个参数：1.图片下标(index)  2.图片位置(position)
+def drawResult(index, imagePos):
+    # 从文件列表中抽取图片的路径
     image = totalList[index]['image']
+    # 加载图片 --> photo
+    photo = pygame.image.load(image)
+    # 画图片
+    canvas.blit(photo, imagePos)
+
 
 # 绘制文本函数
 def fillText(text, center):
