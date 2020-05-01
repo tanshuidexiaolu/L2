@@ -27,6 +27,7 @@ def resize(w, h, new_w, new_h, pil_image):
 
 
 fileList = []  # 图片路径列表
+totalList = []  # 储存所有所需数据
 
 
 # 选择图片函数
@@ -113,6 +114,82 @@ def getData():
         # 将response返回结果进行json解析
         content = response.json()
         print(content)
+        # 获取年龄
+        age = content['result']['face_list'][0]['age']
+        print("年龄为：", age)
+        # 性别
+        gender = content['result']['face_list'][0]['gender']['type']
+        pro = content['result']['face_list'][0]['gender']['probability']
+        # 如果性别判断为男性
+        if gender == 'male':
+            print("性别为：", "男性")
+        # 如果性别判断为女性
+        if gender == 'female':
+            print("性别为：", "女性")
+        print("判断的正确率：" + str(pro * 100) + "%")
+        # 脸型
+        shape = content['result']['face_list'][0]['face_shape']['type']
+        # 脸型判断
+        if shape == 'square':
+            shape = '国字脸'
+        elif shape == 'triangle':
+            shape = '瓜子脸'
+        elif shape == 'oval':
+            shape = '鹅蛋脸'
+        elif shape == 'heart':
+            shape = '心形脸'
+        else:
+            shape = '圆脸'
+        print("脸型为：", shape)
+        # 储存全部所需数据
+        tempDict = {
+            # 图片路径
+            'image': iUrl,
+            # 年龄，性别，脸型
+            'age': age,
+            'gender': gender,
+            'shape': shape
+
+        }
+        # 将tempDict字典储存到totalList中
+        totalList.append(tempDict)
+        print("totalList= ", totalList)
+        # 关闭二级界面
+        window.destroy()
+        showResult()
+
+
+# 创建结果显示的方法
+def showResult():
+    # 创建pygame界面
+    canvasInit()
+    # 设置背景图
+    backgroud = pygame.image.load("images/suspectInfo.png")
+    # 传输图片
+    canvas.blit(backgroud, (0, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+    pygame.display.update()
+    
+# 创建绘制传输结果的方法:两个参数：图片下标，图片位置
+def drawResult(index,imagePos):
+    # 绘制图片的路径
+    image = totalList[index]['image']
+
+# 绘制文本函数
+def fillText(text, center):
+    # 设置字体样式和大小
+    my_font = pygame.font.Font("font/simhei.ttf", 22)
+    # 渲染文字
+    text = my_font.render(text, True, (109, 49, 9))
+    textRectObj = text.get_rect()  # 获得要显示的对象的rect
+    textRectObj.center = center  # 设置显示对象的坐标
+    # 画图片的方法
+    canvas.blit(text, textRectObj)
+
+
 # 二级界面
 window = tk.Tk()
 # 设置窗口不可变
