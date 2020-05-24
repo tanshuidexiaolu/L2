@@ -69,15 +69,24 @@ def getData():
         data=data
     )
     # 2.解析数据
-
+    content = response.json()
     gender = content['result']['face_list'][0]['gender']['type']
     print('性别', gender)
     beauty = content['result']['face_list'][0]['beauty']
     print('颜值', beauty)
 
     # 3.匹配女性英雄
+    # 如果性别为女性，并且颜值在某一段区间
+    if gender == 'female' and 80 <= beauty <= 100:
+        showPhoto("images/female1.jpg", 590, 193)
+    elif gender == 'female' and beauty < 80:
+        showPhoto("images/female4.jpg", 590, 193)
 
     # 4.匹配男性英雄
+    if gender == 'male' and 80 <= beauty <= 100:
+        showPhoto("images/male1.jpg", 590, 193)
+    elif gender == 'male' and beauty < 80:
+        showPhoto("images/male4.jpg", 590, 193)
 
 
 window = tk.Tk()
