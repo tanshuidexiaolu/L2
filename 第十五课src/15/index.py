@@ -15,7 +15,10 @@ def getToday(cityName):
     # 只有当城市名称为中国城市的时候，才显示ok，其他国家城市都显示无效
     if weatherDict['desc'] == "OK":
         print("城市输入正确")
+        print("今日天气", weatherDict['data']['forecast'][0])
+        print("明日天气", weatherDict['data']['forecast'][1])
     else:
         print("无效城市名称")
+    input()
 
 getToday(city)
