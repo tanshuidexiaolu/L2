@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 import requests
+import os
 from subprocess import Popen, PIPE
 
 
@@ -51,6 +52,8 @@ while True:
             exit()
         if event.type == MOUSEBUTTONDOWN and event.button == 1:
             if 680 < event.pos[0] < 934 and 63 < event.pos[1] < 134:
-                print("yeah")
+                os.system("python enterbox.py")
+                with open('message.txt', 'r', encoding='utf-8') as f:
+                    print(f.read())
 
     pygame.display.update()
