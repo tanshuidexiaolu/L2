@@ -114,7 +114,16 @@ def plot():
     for j in lows:
         b = int(j.split(" ")[1].split("℃")[0])
         ylow.append(b)
-    print()
+    plt.style.use("classic")
+    plt.figure(figsize=(10,8))
+    # 设置"中文"字体
+    plt.rcParams['font.sans-serif'] = 'SimHei'
+    # 设置正常的符号显示
+    plt.rcParams['axes.unicode_minus'] = False
+    # 绘制折线图
+    plt.plot(dates,yhigh)
+    plt.plot(dates,ylow)
+    plt.show()
 showDetail()
 while True:
     for event in pygame.event.get():
