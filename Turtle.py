@@ -264,4 +264,4 @@ t.seth(0)
 t.circle(70, 20)
 t.circle(10, 330)
 t.circle(70, 30)
-t.done
+t.done()
